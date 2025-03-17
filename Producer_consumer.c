@@ -9,7 +9,6 @@ s++;
 return s; 
 }
 
-
 int wait(int s){
 s--;
 return s; 
