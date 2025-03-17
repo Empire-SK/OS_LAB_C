@@ -10,7 +10,7 @@ num=$((num/10))
 done
 if [ $reverse -eq $org ]
 then 
-echo "palindrome"
+echo "palindrome" 
 else
 echo "not palindrome"
 fi
