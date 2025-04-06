@@ -1,120 +1,159 @@
-/**
- * The program simulates memory allocation using first fit, best fit, and worst fit strategies for
- * processes and memory blocks.
- */
 #include <stdio.h>
-
-struct process {
-    int pid;
-    int size;
-    int blockIndex;  // Index of allocated block (-1 if not allocated)
+struct process
+{
+   int pid;
+   int blocksize;
+   int size;
 } p[10];
 
-struct block {
-    int size;
-    int remainingSize; // Tracks remaining space in block
-    int allocated;
+struct block
+{
+   int size;
+   int allocated;
 } b[10];
 
 int bn, pn;
-
-void display() {
-    printf("\nProcess ID | Process Size | Block Allocated\n");
-    for (int i = 0; i < pn; i++) {
-        if (p[i].blockIndex == -1) {
-            printf("%9d | %12d | Not Allocated\n", p[i].pid, p[i].size);
-        } else {
-            printf("%9d | %12d | %14d\n", p[i].pid, p[i].size, p[i].blockIndex + 1);
-        }
-    }
+void display()
+{
+   printf(" \n id processize block\n");
+   for (int i = 0; i < pn; i++)
+   {
+      if (p[i].blocksize == -1)
+      {
+         printf("%d %d not allocate\n", p[i].pid, p[i].size);
+      }
+      else
+      {
+         printf("%d %d %d \n", p[i].pid, p[i].size, p[i].blocksize);
+      }
+   }
 }
+void best()
+{
+   printf("\nbest fit\n");
+   struct block temp;
+   for (int i = 0; i < bn - 1; i++)
+   {
+      for (int j = 0; j < bn - i - 1; j++)
+      {
+         if (b[j].size > b[j + 1].size)
+         {
+            temp = b[j];
+            b[j] = b[j + 1];
+            b[j + 1] = temp;
+         }
+      }
+   }
+   for (int i = 0; i < pn; i++)
+   {
+      p[i].blocksize = -1;
+   }
+   for (int i = 0; i < bn; i++)
+   {
+      b[i].allocated = -1;
+   }
 
-void resetBlocks() {
-    for (int i = 0; i < bn; i++) {
-        b[i].remainingSize = b[i].size;
-        b[i].allocated = 0;
-    }
-    for (int i = 0; i < pn; i++) {
-        p[i].blockIndex = -1;
-    }
+   for (int i = 0; i < pn; i++)
+   {
+      for (int j = 0; j < bn; j++)
+      {
+         if (b[j].allocated == -1 && b[j].size >= p[i].size)
+         {
+            b[j].allocated = 1;
+            p[i].blocksize = b[j].size;
+            break;
+         }
+      }
+   }
+
+   display();
 }
+void first()
+{
+   printf("\nfirst fit\n");
+   for (int i = 0; i < pn; i++)
+   {
+      p[i].blocksize = -1;
+   }
+   for (int i = 0; i < bn; i++)
+   {
+      b[i].allocated = -1;
+   }
+   for (int i = 0; i < pn; i++)
+   {
+      for (int j = 0; j < bn; j++)
+      {
+         if (b[j].allocated == -1 && b[j].size >= p[i].size)
+         {
+            b[j].allocated = 1;
+            p[i].blocksize = b[j].size;
+            break;
+         }
+      }
+   }
 
-void firstFit() {
-    printf("\nFirst Fit Allocation\n");
-    resetBlocks();
-    for (int i = 0; i < pn; i++) {
-        for (int j = 0; j < bn; j++) {
-            if (b[j].remainingSize >= p[i].size) {
-                p[i].blockIndex = j;
-                b[j].remainingSize -= p[i].size;
-                break;
-            }
-        }
-    }
-    display();
+   display();
 }
+void worst()
+{
+   printf("\nworst fit\n");
+   struct block temp;
+   for (int i = 0; i < bn - 1; i++)
+   {
+      for (int j = 0; j < bn - i - 1; j++)
+      {
+         if (b[j].size < b[j + 1].size)
+         {
+            temp = b[j];
+            b[j] = b[j + 1];
+            b[j + 1] = temp;
+         }
+      }
+   }
+   for (int i = 0; i < pn; i++)
+   {
+      p[i].blocksize = -1;
+   }
+   for (int i = 0; i < bn; i++)
+   {
+      b[i].allocated = -1;
+   }
 
-void bestFit() {
-    printf("\nBest Fit Allocation\n");
-    resetBlocks();
-    for (int i = 0; i < pn; i++) {
-        int bestIdx = -1;
-        for (int j = 0; j < bn; j++) {
-            if (b[j].remainingSize >= p[i].size) {
-                if (bestIdx == -1 || b[j].remainingSize < b[bestIdx].remainingSize) {
-                    bestIdx = j;
-                }
-            }
-        }
-        if (bestIdx != -1) {
-            p[i].blockIndex = bestIdx;
-            b[bestIdx].remainingSize -= p[i].size;
-        }
-    }
-    display();
+   for (int i = 0; i < pn; i++)
+   {
+      for (int j = 0; j < bn; j++)
+      {
+         if (b[j].allocated == -1 && b[j].size >= p[i].size)
+         {
+            b[j].allocated = 1;
+            p[i].blocksize = b[j].size;
+            break;
+         }
+      }
+   }
+
+   display();
 }
+int main()
+{
 
-void worstFit() {
-    printf("\nWorst Fit Allocation\n");
-    resetBlocks();
-    for (int i = 0; i < pn; i++) {
-        int worstIdx = -1;
-        for (int j = 0; j < bn; j++) {
-            if (b[j].remainingSize >= p[i].size) {
-                if (worstIdx == -1 || b[j].remainingSize > b[worstIdx].remainingSize) {
-                    worstIdx = j;
-                }
-            }
-        }
-        if (worstIdx != -1) {
-            p[i].blockIndex = worstIdx;
-            b[worstIdx].remainingSize -= p[i].size;
-        }
-    }
-    display();
-}
+   printf("enter the no of block");
+   scanf("%d", &bn);
+   for (int i = 0; i < bn; i++)
+   {
+      printf("enter the size of the block %d", i + 1);
+      scanf("%d", &b[i].size);
+   }
+   printf("enter the no of process");
+   scanf("%d", &pn);
+   for (int i = 0; i < pn; i++)
+   {
+      printf("enter the process %d", i + 1);
+      scanf("%d", &p[i].size);
+      p[i].pid = i + 1;
+   }
 
-int main() {
-    printf("Enter the number of memory blocks: ");
-    scanf("%d", &bn);
-    
-    for (int i = 0; i < bn; i++) {
-        printf("Enter size of block %d: ", i + 1);
-        scanf("%d", &b[i].size);
-    }
-
-    printf("Enter the number of processes: ");
-    scanf("%d", &pn);
-    
-    for (int i = 0; i < pn; i++) {
-        printf("Enter size of process %d: ", i + 1);
-        scanf("%d", &p[i].size);
-        p[i].pid = i + 1;
-    }
-
-    firstFit();
-    bestFit();
-    worstFit();
-    
-    return 0;
+   first();
+   best();
+   worst();
 }

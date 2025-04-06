@@ -28,7 +28,7 @@ void calculateWaiting(){
                     waiting[i] = time - burst[i] - arrival[i];
                     remainingTime[i] = 0;
                     remPro--;
-                } else if(remainingTime[i] > 0) {
+                } else{
                     remainingTime[i] -= t;
                     time += t;
                 }
